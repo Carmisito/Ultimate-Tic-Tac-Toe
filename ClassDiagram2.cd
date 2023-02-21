@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="tic_tac_toe.AI">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAACAAUCAAAAAAAAAAAAAQIAAQAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="tic_tac_toe.Globals">
+    <Position X="7.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EQAiARQAIBBhAAAQCCwACIAAACAACAAAEhBAIEACwAA=</HashCode>
+      <FileName>Assets\Scripts\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="tic_tac_toe.Map_Value">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAAgAAACAAgAAIAIAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="tic_tac_toe.UI">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgBBAAAAAAAAAAAAAAAAAAAMAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="tic_tac_toe.CheckState">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="tic_tac_toe.GameController">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACABAAIChhVgAAAIAAAAAAACAAAAAAMBDAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GameController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
