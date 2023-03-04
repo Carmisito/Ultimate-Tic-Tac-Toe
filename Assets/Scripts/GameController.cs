@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -682,6 +682,41 @@ namespace tic_tac_toe
         }
 
 
+        //Name: number_of_side_squares
+        //General: Returns the number of side squares placed for a certain bitBoard
+        //Parameters: short board
+        //Returns: the the number of side squares placed (int)
+        //Complexity: O(1)
+        public int number_of_side_squares(short board)
+        {
+            int amount = 0, i = 0;
+            for (i = 2; i <= 128; i *= 4) 
+            {
+                if ((board & i) == i)
+                    amount++;
+            }
+            return amount;
+        }
+
+
+        //Name: number_of_corner_squares
+        //General: Returns the number of corner squares placed for a certain bitBoard
+        //Parameters: short board
+        //Returns: the the number of corner squares placed (int)
+        //Complexity: O(1)
+        public int number_of_corner_squares(short board)
+        {
+            int amount = 0, i = 0;
+            for (i = 1; i <= 256; i *= 4)//This loop checks the center since there is no way of reaching all corner sqaures without also checking the middle square
+                                         // while it might be more efficient to use 4 IF checks instead of checking the center every time, I refuse to do so out of spite.
+            {
+                if (i != 16 && (board & i) == i)
+                    amount++;
+            }
+            return amount;
+        }
+
+
         //Name: heuristic
         //General: Gives an evaluation for a position from int.MaxValue for X to int.MinValue for O
         //Parameters: None
@@ -698,46 +733,72 @@ namespace tic_tac_toe
             if (Globals.cs.is_Tie(9))
                 return 0;
 
-            for (i = 0; i < 9; i++)
+            for (i = 0; i < 9; i++) //go over the 9 small grids
             {
                 Globals.mask = 1;
                 Globals.mask <<= i;
-                if (!Globals.deactivated_Grids[i])
+                if (!Globals.deactivated_Grids[i]) //grids that are no longer active should not have their inner soldiers counted
                 {
-                    answer += number_Of_2_In_A_Row(Globals.bitBoardX[i], Globals.bitBoardO[i]) * 3; //add 3 for every 2 in a row
-                    answer -= number_Of_2_In_A_Row(Globals.bitBoardO[i], Globals.bitBoardX[i]) * 3;
-                    if ((Globals.bitBoardX[i] & 16) == 16) //subtract 1 if you got the center because youre sending your opponent to a valuable grid
-                        answer -= 1;
+
+                    //--------------------------------------------------------------------------------------------------------------------------------
+                    //Add 5 for every 2 in a row:
+                    //A 2-in-a-row should be more valuable than any one square.
+
+                    answer += number_Of_2_In_A_Row(Globals.bitBoardX[i], Globals.bitBoardO[i]) * 5;
+                    answer -= number_Of_2_In_A_Row(Globals.bitBoardO[i], Globals.bitBoardX[i]) * 5;
+
+
+                    //--------------------------------------------------------------------------------------------------------------------------------
+                    //The amount of points alloted to each square is decided by the amount of possible wins that square can offer
+                    //add 2 points if you got the center because you're sending your opponent to a valuable grid
+
+                    if ((Globals.bitBoardX[i] & 16) == 16)
+                        answer += 2;
                     else if ((Globals.bitBoardO[i] & 16) == 16)
-                        answer += 1;
+                        answer -= 2;
 
-                    for (j = 2; j <= 128; j *= 4) //add 1 if you got the side squares in order to send the opponent to a less valuable grid
-                    {
-                        if ((Globals.bitBoardX[i] & j) == j)
-                            answer++;
-                        if ((Globals.bitBoardO[i] & j) == j)
-                            answer--;
-                    }
+                    //--------------------------------------------------------------------------------------------------------------------------------
+                    //add 3 points if you got the corner squares because you sent the opponent to a neutral value grid
+
+                    answer += number_of_corner_squares(Globals.bitBoardX[i]) * 3;
+                    answer -= number_of_corner_squares(Globals.bitBoardO[i]) * 3;
+
+                    //--------------------------------------------------------------------------------------------------------------------------------
+                    //add 4 points if you got the side squares because you sent the opponent to a less valuable grid
+
+                    answer += number_of_side_squares(Globals.bitBoardX[i]) * 4;
+                    answer -= number_of_side_squares(Globals.bitBoardO[i]) * 4;
+
+                    //--------------------------------------------------------------------------------------------------------------------------------
 
                 }
-                else if ((Globals.bitBoardX[9] & Globals.mask) != 0) //add 30 if a grid is won
-                {
-                    answer += 30;
-                    if (i == 4) //if the center grid is won add 8
-                        answer += 8;
-                }
-                else if ((Globals.bitBoardO[9] & Globals.mask) != 0)
-                {
-                    answer -= 30;
-                    if (i == 4)
-                        answer -= 8;
-                }
-
             }
 
+            //--------------------------------------------------------------------------------------------------------------------------------
+            //add 22 points if a grid is won:
+            //the maximum number of possible 2-in-a-rows (7) multiplied by the number of points awarded to a 2-in-a-row (3), plus one. Its ALWAYS more valuable to win than create 2-in-a-rows
 
-            answer += number_Of_2_In_A_Row(Globals.bitBoardX[9], (short)(Globals.bitBoardO[9] | Globals.tied_grids)) * 40;
-            answer -= number_Of_2_In_A_Row(Globals.bitBoardO[9], (short)(Globals.bitBoardX[9] | Globals.tied_grids)) * 40;
+            answer += number_of_side_squares(Globals.bitBoardX[9]) * 22;
+            answer -= number_of_side_squares(Globals.bitBoardO[9]) * 22;
+
+            //--------------------------------------------------------------------------------------------------------------------------------
+            //Corner squares have 1.5 times the possible wins a side square has.
+
+            answer += number_of_corner_squares(Globals.bitBoardX[9]) * 33;
+            answer -= number_of_corner_squares(Globals.bitBoardO[9]) * 33;
+
+            //--------------------------------------------------------------------------------------------------------------------------------
+            //if the center grid is won, double the points (center square is twice as valuable as side squares)
+            if ((Globals.bitBoardX[9] & 16) == 16)
+                answer += 44;
+            else if ((Globals.bitBoardO[9] & 16) == 16)
+                answer -= 44;
+
+            //--------------------------------------------------------------------------------------------------------------------------------
+
+            // A 2-in-a-row on the main grid must be worth more than the most valuable grid, so that an unblocked 2-in-a-row is more preferential than a blocked path but with a center square
+            answer += number_Of_2_In_A_Row(Globals.bitBoardX[9], (short)(Globals.bitBoardO[9] | Globals.tied_grids)) * 45;
+            answer -= number_Of_2_In_A_Row(Globals.bitBoardO[9], (short)(Globals.bitBoardX[9] | Globals.tied_grids)) * 45;
 
             return answer;
         }
@@ -747,10 +808,10 @@ namespace tic_tac_toe
         //Name: number_Of_2_In_A_Row
         //General: counts the amount of active (unblocked) 2 pieces in a rows for a certain board
         //Parameters: short board - the board we are checking
-        //short enemy_Board - the board that might block the given board
+        //short enemy_Board - the enemy board that might block the given board
         //Returns: The number of 2 unblocked pieces in a row
         //Complexity: O(1)
-        public int number_Of_2_In_A_Row(short board, short enemy_Board) //if there is 2 in a row (that isnt blocked) then add to the counter and return
+        public int number_Of_2_In_A_Row(short board, short enemy_Board) //if there is a 2 in a row (that isnt blocked) then add to the counter and return
         {
             int i = 0, j = 0, answer = 0, counter = 0;
 
