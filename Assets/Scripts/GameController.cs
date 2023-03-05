@@ -13,7 +13,6 @@ namespace tic_tac_toe
 
         public static int turn_Indicator;  //0 = O, 1 = X
         public static int turn_Counter;    //counts the number of turns played
-        public static short mask;
         public static short tied_grids;
         public static GameObject[] turn_Icons; //displays who's turn it is
         public static GameObject[] grids; //all the 9 grids on the board (the 9 smaller boards inside the big one
@@ -174,6 +173,7 @@ namespace tic_tac_toe
         {
             //initialize vars
             int i = 0;
+            short mask = 1;
             bitBoardX = new short[10]; //initializes the bit boards
             bitBoardO = new short[10]; //initializes the bit boards
             answer_Board = new short[9]; //the heuristic value for each square
@@ -532,28 +532,29 @@ namespace tic_tac_toe
         public void button_Played(int number_Of_Button)
         {
             int i;
+            short mask = 1;
             //the mask turns on the bit in the bit board
-            Globals.mask = 1; //resets the mask
-            Globals.mask <<= number_Of_Button % 9; //moves the bit to the correct place. 0 means it wont move and stay
+            mask = 1; //resets the mask
+            mask <<= number_Of_Button % 9; //moves the bit to the correct place. 0 means it wont move and stay
             Globals.turn_Counter++; //increases the turn counter
 
             //--------------------------------------------------------------------------------------------------------------------------------
 
             if (Globals.turn_Indicator == 0)
-                Globals.bitBoardO[number_Of_Button / 9] |= Globals.mask; //light the bit in the bit board using the mask
+                Globals.bitBoardO[number_Of_Button / 9] |= mask; //light the bit in the bit board using the mask
             else
-                Globals.bitBoardX[number_Of_Button / 9] |= Globals.mask; //light the bit in the bit board using the mask
+                Globals.bitBoardX[number_Of_Button / 9] |= mask; //light the bit in the bit board using the mask
 
             //--------------------------------------------------------------------------------------------------------------------------------
-            Globals.mask = 1;
-            Globals.mask <<= number_Of_Button / 9; //moves the bit to the correct place (finds the board that was just played)
+            mask = 1;
+            mask <<= number_Of_Button / 9; //moves the bit to the correct place (finds the board that was just played)
 
             if (Globals.turn_Indicator == 1)
             {
                 if (Globals.cs.Check_Win(Globals.bitBoardX[number_Of_Button / 9]))
                 {
                     win_Grid(number_Of_Button / 9);
-                    Globals.bitBoardX[9] |= Globals.mask;
+                    Globals.bitBoardX[9] |= mask;
 
 
                     if (Globals.cs.Check_Win(Globals.bitBoardX[9])) //if they won the entire game
@@ -570,7 +571,7 @@ namespace tic_tac_toe
                 if (Globals.cs.Check_Win(Globals.bitBoardO[number_Of_Button / 9]))
                 {
                     win_Grid(number_Of_Button / 9);
-                    Globals.bitBoardO[9] |= Globals.mask;
+                    Globals.bitBoardO[9] |= mask;
 
 
                     if (Globals.cs.Check_Win(Globals.bitBoardO[9])) //if they won the entire game
@@ -585,9 +586,9 @@ namespace tic_tac_toe
             if (Globals.cs.is_Tie(number_Of_Button / 9)) //if the bit board is a tie
             {
                 Globals.deactivated_Grids[number_Of_Button / 9] = true;
-                Globals.mask = 1;
-                Globals.mask <<= number_Of_Button / 9;
-                Globals.tied_grids |= Globals.mask;
+                mask = 1;
+                mask <<= number_Of_Button / 9;
+                Globals.tied_grids |= mask;
             }
 
             for (i = 0; i < Globals.deactivated_Grids.Length; i++) //check if the game ended
@@ -725,6 +726,7 @@ namespace tic_tac_toe
         public int heuristic()
         {
             int answer = 0, i = 0, j = 0;
+            short mask = 1;
 
             if (Globals.cs.Check_Win(Globals.bitBoardX[9]))
                 return int.MaxValue; //change to max int
@@ -735,8 +737,8 @@ namespace tic_tac_toe
 
             for (i = 0; i < 9; i++) //go over the 9 small grids
             {
-                Globals.mask = 1;
-                Globals.mask <<= i;
+                mask = 1;
+                mask <<= i;
                 if (!Globals.deactivated_Grids[i]) //grids that are no longer active should not have their inner soldiers counted
                 {
 
